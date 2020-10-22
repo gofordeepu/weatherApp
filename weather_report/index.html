@@ -1,0 +1,202 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather report</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<link rel="icon" href="sun.png">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+<style>
+    .container{
+       background-image: url('weather.jpg');
+       background-size: 100% 100%;
+        margin-top: 3em;
+        width: 424px;
+        height: 506px;
+        position: relative;
+    }
+    .container img{
+        width: 300px;
+        height: 500px;
+        margin-left: 25em;
+    }
+    .container .heading{
+        padding: 5px;
+        margin-top: 10px;
+        text-align: center;
+    }
+    .heading h1{
+        font-size: 30px;
+        font-family: cursive;
+        font-weight: bolder;
+        color:white;
+    }
+    .header h1{
+        font-size: 20px;
+        font-weight: bolder;
+    }
+    .section{
+        width: 100%;
+        height: 200px;
+        
+    }
+    .section .header{
+        text-align: center;
+        color: aqua;
+    }
+    .input-city{
+
+        width: 100px;
+    }
+    #city{
+        width: 8em;
+        height: 2em;
+        text-align: center;
+        border: 2px solid black;
+        border-radius: 7px;
+        margin-left: 8em;
+        display: inline-block;
+    }
+    #sub-btn
+    {
+        margin-left: 9.5em;
+        margin-top:5px;
+        display: inline-block;
+    }
+    #weather-icon{
+        z-index: 100;
+        margin-right: 20em;
+        height: 50px;
+        width: 100px;
+        margin-left: 150px;
+        margin-top:10px ;
+    }
+    .weather-report{
+        color:white;
+    }
+</style>
+</head>
+<body>
+    <div class="mar">
+        <marquee behavior="" direction="" scrollamount="15" style="background-color: blue; color: white;"><b>Created by Deepu singh</b></marquee>
+    </div>
+  <div class="container">
+      <div class="heading">
+          <h1>Weather report</h1>
+          <div class="error">
+           
+          </div>
+      </div>
+      <div class="section">
+            <div class="header">
+                <h1>Enter city name</h1>
+            </div>
+            <div class="input-city">
+              <input type="text"  id="city" placeholder="Enter city name">
+              <button type="submit" class="btn btn-primary" id="sub-btn">Submit</button>
+            </div>
+           
+    </div>  
+    <div class="data">
+
+    </div>
+
+    <!-- jquery coding-->
+
+
+  <script>
+      $(document).ready(function(){
+          $('#sub-btn').click(function(){
+              var city=$('#city').val();
+              
+             if(city!='')
+             {
+                $('.heading').hide();
+                $('.section').hide();
+            $.ajax({
+              url:`http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=586ce7521b478472f71ba0f458e72d69`,
+              data:"JSON",
+              type:"GET",
+               success:function(data){
+                
+                    console.log(data);
+                  var widget=showdata(data);
+                  $('.data').html(widget);
+                  $('#city').val('');
+               
+              },
+             statusCode:{
+                    404: function() {
+                        $(".heading").show();
+                        $(".section").show();
+                        $('#city').val('');
+                    var e= `<div class="alert alert-warning alert-dismissible fade show" role="alert">
+                   <strong>Hey!</strong> Please Enter the valid city name
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                   <span aria-hidden="true">&times;</span>
+                  </button>
+                   </div>`;
+                  $('.error').html(e);
+                       }
+             }
+           });
+             }
+             else{
+                 var e= `<div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Hey!</strong> Please Enter the city name
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>`;
+                $('.error').html(e);
+             }
+          });
+      function showdata(data){
+          return `
+          <div class="weather-report">
+                 <h2 style="color:white;text-align:center">${data.name},${data.sys.country}:</h2>
+                 <img src="http://openweathermap.org/img/wn/${data.weather[0].icon}.png" id='weather-icon' >
+                 <h2 style="color:white;text-align:center;">${data.weather[0].description}</h2>
+                 <h1 style="color:white;text-align:center;">${Math.floor(data.main.temp-273)}&deg;C</h1>
+                 <h1>More details:</h1>
+                 <h4><strong>Humidity</strong>:${data.main.humidity}%</h3>
+                 <h4><strong>Min. Temperature</strong>:${Math.floor(data.main.temp_min-273)}&deg;C</h4>
+                 <h4><strong>Max.Temperature</strong>:${Math.floor(data.main.temp_max-273)}&deg;C</h4>
+                 <h4><strong>Wind speed</strong>:${(Math.floor(data.wind.speed*3600)/1000)}km/hr</h4>
+                 <button type="submit" class="btn btn-primary" id="back-btn">back</button>
+
+         </div>
+
+                
+          `;
+      }   
+      $(document).on("click","#back-btn",function(){
+            $(".weather-report").hide();
+            $('.heading').show();
+              $('.section').show();
+      }); 
+           
+      });
+  </script>
+</body>
+</html>
+<!---
+                 <h3><strong>Weather</strong>:${data.weather[0].main}</h3>
+                 <h3><strong>Description</strong>:<img src="http://openweathermap.org/img/wn/${data.weather[0].icon}.png" >${data.weather[0].description}</h3>
+                 <h3><strong>Temperature</strong>:${Math.floor(data.main.temp-273)}&deg;C</h3>
+                 <h3><strong>Pressure</strong>:${data.main.pressure} mbar</h3>
+                 <h3><strong>Humidity</strong>:${data.main.humidity}%</h3>
+                 <h3><strong>Min. Temperature</strong>:${Math.floor(data.main.temp_min-273)}&deg;C</h3>
+                 <h3><strong>Max.Temperature</strong>:${Math.floor(data.main.temp_max-273)}&deg;C</h3>
+                 <h3><strong>Wind speed</strong>:${(data.wind.speed*3600)/1000}km/hr</h3>
+                 <h3><strong>Wind direction</strong>:${data.wind.deg}&deg</h3>
+
+
+
+
+
+-->
